@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -13,17 +14,17 @@ public class Client implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotEmpty
     private String name;
-    @NotNull
+    @NotEmpty
     private String account;
 
     public Client() {
     }
 
-    public Client(String name, String account) {
+    public Client(@NotEmpty String name, @NotEmpty String account) {
         this.name = name;
         this.account = account;
     }
@@ -57,14 +58,11 @@ public class Client implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Client client = (Client) o;
-        return id.equals(client.id) &&
-                name.equals(client.name) &&
-                account.equals(client.account);
+        return id.equals(client.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, account);
+        return Objects.hash(id);
     }
-
 }

@@ -5,8 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 public class AESEncryptionTests {
@@ -19,13 +18,13 @@ public class AESEncryptionTests {
 
     @Test
     public void encryptAGivenString() throws Exception {
-        String encrypted =  aesEncryption.encrypt(beforeEncrypt);
-       assertThat(encrypted).isEqualTo(beforeDecrypt);
+        String encrypted = aesEncryption.encrypt(beforeEncrypt);
+        assertThat(encrypted).isEqualTo(beforeDecrypt);
     }
 
     @Test
     public void decryptAGivenString() throws Exception {
-        String decrypted =  aesEncryption.decrypt(beforeDecrypt);
+        String decrypted = aesEncryption.decrypt(beforeDecrypt);
         assertThat(decrypted).isEqualTo(beforeEncrypt);
     }
 }

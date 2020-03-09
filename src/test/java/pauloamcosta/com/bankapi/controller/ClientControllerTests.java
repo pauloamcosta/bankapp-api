@@ -1,7 +1,6 @@
 package pauloamcosta.com.bankapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javassist.NotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import org.springframework.web.client.ResourceAccessException;
+import pauloamcosta.com.bankapi.DTO.ClientDTO;
 import pauloamcosta.com.bankapi.domain.Client;
 import pauloamcosta.com.bankapi.resources.exceptions.ClientNotFoundException;
 import pauloamcosta.com.bankapi.service.ClientService;
@@ -25,7 +24,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -68,7 +68,7 @@ public class ClientControllerTests {
         c1.setAccount("31231231");
 
         //when
-        given(clientService.findClient(1l)).willReturn(java.util.Optional.of(c1));
+        given(clientService.findClient(1l)).willReturn(c1);
 
         //then
         mvc.perform(get("/clients/1"))
@@ -77,10 +77,11 @@ public class ClientControllerTests {
         verify(clientService, times(1)).findClient(1l);
 
     }
+
     @Test
     public void testFindAndDecryptClientWhenClientDoesntExistsShouldReturn404() throws Exception {
         // given
-        when(clientService.findClient( 1l)).thenThrow(new ClientNotFoundException());
+        when(clientService.findClient(1l)).thenThrow(new ClientNotFoundException());
 
         mvc.perform(get("/clients/1"))
                 .andExpect(status().isNotFound());
@@ -88,33 +89,33 @@ public class ClientControllerTests {
     }
 
     @Test
-    public void testSaveClientValidShouldReturn201() throws Exception{
-        Client c1 = new Client();
-        c1.setId(Long.valueOf(1));
+    public void testSaveClientValidShouldReturn201() throws Exception {
+        ClientDTO c1 = new ClientDTO();
+        c1.setId(1l);
         c1.setName("Test Client");
         c1.setAccount("31231231");
+
         doNothing().when(clientService).saveClient(c1);
+        //when(clientService.fromDTO( c1)).thenReturn(c1);
+
         mvc.perform(
                 post("/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(c1)))
                 .andExpect(status().isCreated());
-        verify(clientService, times(1)).saveClient(c1);
-        verifyNoMoreInteractions(clientService);
     }
 
     @Test
-    public void testSaveClientInvalid() throws Exception {
-        Client c1 = new Client();
+    public void testSaveClientInvalidAndReturn400() throws Exception {
+        ClientDTO c1 = new ClientDTO();
         c1.setName("Test Client");
 
         doNothing().when(clientService).saveClient(c1);
         mvc.perform(
                 post("/clients")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(c1)));
-        verify(clientService, times(0)).saveClient(c1);
-        verifyNoInteractions(clientService);
+                        .content(asJsonString(c1)))
+                .andExpect(status().is4xxClientError());
     }
 
     public static String asJsonString(final Object obj) {

@@ -42,6 +42,6 @@ public class ClientRepositoryTests {
         clientRepository.save(c2);
         List<Client> clientsList = clientRepository.findAll();
         assertThat(clientsList).isNotEmpty();
-        assertThat(clientsList).size().isEqualTo(6);
+        assertThat(clientsList).size().isEqualTo(2);
     }
 }
